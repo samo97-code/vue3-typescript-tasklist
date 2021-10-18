@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Our TasksInterface</h1>
+    <h1>Our Tasks Interface</h1>
     <div class="table">
       <table>
         <thead>
@@ -10,7 +10,8 @@
             <th>Description</th>
             <th>Date</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th>Show</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -20,7 +21,16 @@
             <td>{{ task.description }}</td>
             <td>{{ task.date }}</td>
             <td>{{ task.status }}</td>
-            <td>Edit | Delete</td>
+            <td>
+              <button class="show-btn" @click.prevent="toLink(task.id)">
+                Show
+              </button>
+            </td>
+            <td>
+              <button class="delete-btn" @click.prevent="deleteTask">
+                Delete
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -29,57 +39,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
-import Tasks from "@/interface/Tasks.interface";
+import { defineComponent, computed } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "Home",
   components: {},
   setup() {
-    const tasks = reactive<Tasks[]>([
-      {
-        id: 1,
-        title: "Learn vue 3",
-        description:
-          "It is a long established fact that a reader will be distracted by the readable",
-        date: "Wed Oct 13 2021 22:30:46",
-        status: "working",
-      },
-      {
-        id: 2,
-        title: "Learn typescript",
-        description:
-          "It is a long established fact that a reader will be distracted by the readable",
-        date: "Wed Oct 13 2021 22:30:46",
-        status: "finished",
-      },
-      {
-        id: 3,
-        title: "Learn composition api",
-        description:
-          "It is a long established fact that a reader will be distracted by the readable",
-        date: "Wed Oct 13 2021 22:30:46",
-        status: "working",
-      },
-      {
-        id: 4,
-        title: "Creat project",
-        description:
-          "It is a long established fact that a reader will be distracted by the readable",
-        date: "Wed Oct 13 2021 22:30:46",
-        status: "working",
-      },
-      {
-        id: 5,
-        title: "Creat project",
-        description:
-          "It is a long established fact that a reader will be distracted by the readable",
-        date: "Wed Oct 13 2021 22:30:46",
-        status: "working",
-      },
-    ]);
+    const store = useStore();
+    const router = useRouter();
 
-    return { tasks };
+    const tasks = computed(() => store.getters.tasks);
+
+    const deleteTask = (): void => {
+      console.log("delete Task");
+    };
+
+    const toLink = (id: number): void => {
+      router.push(`/task-details/${id}`);
+    };
+
+    return { tasks, deleteTask, toLink };
   },
 });
 </script>
@@ -100,6 +81,33 @@ export default defineComponent({
 
       td {
         border: solid 1px #aaa999;
+        padding: 7px;
+
+        button {
+          cursor: pointer;
+          outline: none;
+          border: none;
+          padding: 5px;
+          border-radius: 5px;
+          transition: all 0.3s ease-in-out;
+          color: white;
+        }
+
+        .delete-btn {
+          background: #dc3545;
+
+          &:hover {
+            background: #a90a18;
+          }
+        }
+
+        .show-btn {
+          background: #17a2b8;
+
+          &:hover {
+            background: #066877;
+          }
+        }
       }
     }
   }

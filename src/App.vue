@@ -3,7 +3,7 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/create-task">Create Task</router-link>
   </div>
-  <router-view/>
+  <router-view />
 </template>
 
 <style lang="scss">

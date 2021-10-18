@@ -3,7 +3,7 @@ interface Tasks {
   title: string;
   description: string;
   date: string;
-  status: 'working' | 'finished' | 'created';
+  status: "working" | "finished" | "created";
 }
 
-export default Tasks
+export default Tasks;
