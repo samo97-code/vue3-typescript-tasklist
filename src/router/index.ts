@@ -10,20 +10,12 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/create-task",
     name: "CreateTask",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/CreateTask.vue"),
+    component: () => import("../views/CreateTask.vue"),
   },
   {
     path: "/task-details/:id",
     name: "TaskDetails",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/TaskDetails.vue"),
+    component: () => import("../views/TaskDetails.vue"),
   },
 ];
 

@@ -11,6 +11,7 @@
             <th>Date</th>
             <th>Status</th>
             <th>Show</th>
+            <th>Edit</th>
             <th>Delete</th>
           </tr>
         </thead>
@@ -27,6 +28,9 @@
               </button>
             </td>
             <td>
+              <button class="edit-btn">Edit</button>
+            </td>
+            <td>
               <button class="delete-btn" @click.prevent="deleteTask">
                 Delete
               </button>
@@ -39,20 +43,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useStore } from "vuex";
+import { defineComponent } from "vue";
 import { useRouter } from "vue-router";
+import useFetchTasks from "@/hooks/useFetchTasks";
 
 export default defineComponent({
   name: "Home",
   components: {},
-  setup() {
-    const store = useStore();
+  async setup() {
     const router = useRouter();
-
-    const tasks = computed(() => store.getters.tasks);
+    const tasks = await useFetchTasks();
 
     const deleteTask = (): void => {
+      // @TODO delete task with request
       console.log("delete Task");
     };
 
@@ -101,11 +104,19 @@ export default defineComponent({
           }
         }
 
-        .show-btn {
+        .edit-btn {
           background: #17a2b8;
 
           &:hover {
             background: #066877;
+          }
+        }
+
+        .show-btn {
+          background: #007bff;
+
+          &:hover {
+            background: #0357b9;
           }
         }
       }

@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive } from "vue";
+import { defineComponent, reactive } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import Tasks from "@/interface/Tasks.interface";
@@ -47,9 +47,9 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
 
-    const tasks = computed(() => store.getters.tasks);
-
-    const form: { [key: string]: string } = reactive({
+    // if we want hooks key as index
+    // const form: { [key: string]: string } = reactive({
+    const form = reactive({
       title: "",
       date: "",
       description: "",
@@ -57,16 +57,16 @@ export default defineComponent({
 
     const createTask = async () => {
       const obj: Tasks = {
-        id: tasks.value.length + 1,
+        id: Date.now(),
         title: form.title,
         date: form.date,
         description: form.description,
         status: "created",
       };
 
-      await store.commit("setTasks", obj);
-      await Object.keys(form).forEach((item: string) => (form[item] = ""));
+      await store.dispatch("createTask", obj);
       await router.push("/");
+      // await Object.keys(form).forEach((item: string) => (form[item] = ""));
     };
 
     return { form, createTask };
