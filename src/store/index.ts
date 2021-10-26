@@ -16,6 +16,9 @@ export default createStore({
     async createTask(_, payload) {
       return await axios.post("http://localhost:8081/tasks", payload);
     },
+    async deleteTask(_, payload) {
+      return await axios.delete(`http://localhost:8081/tasks/${payload.id}`);
+    },
   },
   getters: {
     // tasks: (state) => state.tasks,
