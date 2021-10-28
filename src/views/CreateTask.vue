@@ -6,6 +6,7 @@
         <label for="title" class="title-name">Title</label>
         <input
           id="title"
+          class="searchbar"
           v-model="form.title"
           type="text"
           placeholder="Title"
@@ -13,7 +14,7 @@
       </div>
       <div class="form-group">
         <label for="date" class="title-name">Date</label>
-        <input id="date" v-model="form.date" type="date" placeholder="Date" />
+        <input id="date" v-model="form.date" type="date" placeholder="Date"  class="searchbar"/>
       </div>
       <div class="form-group">
         <label for="desc" class="title-name">Description</label>
@@ -23,11 +24,12 @@
           cols="30"
           rows="10"
           placeholder="Description"
+          class="textarea"
         ></textarea>
       </div>
 
       <div>
-        <button @click.prevent="createTask">Create Task</button>
+        <button @click.prevent="createTask" class="success-btn">Create Task</button>
       </div>
     </div>
   </div>

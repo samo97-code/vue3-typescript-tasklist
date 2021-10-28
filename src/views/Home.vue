@@ -1,25 +1,7 @@
 <template>
   <div class="home">
     <h1>Our Tasks Interface ({{tasks.length}})</h1>
-    <div class="form">
-      <input type="text" placeholder="Search..." class="searchbar" v-model="search"/>
-
-      <select id="" class="select-box">
-        <option value="5" selected>5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-        <option value="20">20</option>
-      </select>
-
-      <button class="show-btn">
-        Select All
-      </button>
-
-      <button class="delete-btn">
-        Delete All
-      </button>
-    </div>
-
+    <Form v-model:search="search" v-model:limit="limit" @select-all="selectAll" @delete-all="deleteAll" :tasks="tasks" :selected-items="selected" />
     <div class="table">
       <table>
         <thead>
@@ -39,7 +21,7 @@
               Description
               <OrderBy :attr="'description'" @ordering="orderBy"/>
             </th>
-            <th>
+            <th style="width: 100px">
               Status
               <OrderBy :attr="'status'" @ordering="orderBy"/>
             </th>
@@ -54,7 +36,9 @@
         </thead>
         <tbody>
           <tr v-for="task in tasks" :key="task.id">
-            <td><input type="checkbox"></td>
+            <td>
+              <input type="checkbox" :checked="selected.includes(task.id)" @change="selectItem(task.id)" class="checkbox">
+            </td>
             <td>{{ task.id }}</td>
             <td>{{ task.title }}</td>
             <td>{{ descFormat(task.description) }}</td>
@@ -89,50 +73,54 @@
           </tr>
         </tbody>
       </table>
+      <h3 v-if="!tasks.length">We cant find search task 😔</h3>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-
-
-import { defineComponent, ref, watch } from "vue";
+import {defineComponent, Ref, ref, watch} from "vue";
 import { useRouter } from "vue-router";
 import useFetchTasks from "@/hooks/useFetchTasks";
-import { useStore } from "vuex";
+import { Store, useStore} from "vuex";
 import Tasks from "@/interface/Tasks.interface";
 import OrderBy from "@/components/OrderBy.vue";
+import Form from "@/components/Form.vue";
 
 export default defineComponent({
   name: "Home",
   components: {
     OrderBy,
+    Form
   },
   async setup() {
     const router = useRouter();
     const store = useStore();
     let search = ref('')
+    let limit = ref(10)
+    const selected = ref([]) as Ref<Array<number>>
     let tasks = ref([]);
+    let listTasks: never[] = []
 
     //Watch
     watch(search, (val) => {
-      if (val){
-        tasks.value = listTasks.filter((item: Tasks)=> {
-          console.log(item.title.toLowerCase().includes(val),'1111')
+      if (val) {
+        tasks.value = listTasks.filter((item: Tasks) => {
           if (item.title.includes(val) ||
             item.title.toUpperCase().includes(val) ||
-            item.title.toLowerCase().includes(val)){
+            item.title.toLowerCase().includes(val)) {
             return item
           }
         })
-        console.log(tasks.value,'x')
-      }else tasks.value = listTasks
+      } else tasks.value = listTasks
     })
 
-    const listTasks = await useFetchTasks()
-    tasks.value = listTasks
+    watch(limit, async (val) => {
+      await getTasks(store, val)
+    })
 
 
+    //Computed
     const descFormat = (desc: string) => desc.substr(0, 50) + "...";
 
     const checkStatus = (status: string) => {
@@ -144,6 +132,40 @@ export default defineComponent({
 
       return list.find((item) => item.status === status);
     };
+
+
+    //Methods
+    const getTasks = async (store: Store<any>, limit: number)=>{
+      listTasks = await useFetchTasks(store,limit)
+      tasks.value = listTasks
+    }
+
+    await getTasks(store, limit.value)
+
+    const selectAll = (items: Array<number>)=>{
+      selected.value = items
+    }
+
+    const selectItem = (id: number)=>{
+      if (selected.value.includes(id)){
+        const index = selected.value.findIndex((item)=>item === id)
+        selected.value.splice(index,1)
+      } else selected.value.push(id)
+    }
+
+    const deleteAll = async (): Promise<void>=>{
+      if (selected.value.length){
+        try {
+          await selected.value.forEach(async(id)=>{
+            await store.dispatch("deleteTask", { id });
+            const index = await tasks.value.findIndex((item: Tasks) => item.id === id);
+            tasks.value.splice(index, 1);
+          })
+        } catch (e) {
+          console.log(e.message);
+        }
+      }
+    }
 
     const deleteTask = async (id: number): Promise<void> => {
       try {
@@ -167,87 +189,28 @@ export default defineComponent({
       }
     }
 
-    return { tasks,search, deleteTask, toLink, descFormat, checkStatus, orderBy };
+    return { tasks,search, limit,selected, deleteTask, toLink, descFormat, checkStatus, orderBy, selectAll, selectItem, deleteAll };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-button {
-  cursor: pointer;
-  outline: none;
-  border: none;
-  padding: 5px;
-  border-radius: 5px;
-  transition: all 0.3s ease-in-out;
-  color: white;
-}
-
-.delete-btn {
-  background: #dc3545;
-
-  &:hover {
-    background: #a90a18;
-  }
-}
-
-.edit-btn {
-  background: #17a2b8;
-
-  &:hover {
-    background: #066877;
-  }
-}
-
-.show-btn {
-  background: #007bff;
-
-  &:hover {
-    background: #0357b9;
-  }
-}
-
-.form {
-  text-align: left;
-  width: 800px;
-  margin: 0 auto 24px auto;
-
-  .searchbar{
-    height: 24px;
-    outline: none;
-    border: 1px solid #ccc;
-    border-radius: 7px;
-    padding: 2px 12px;
-    color: #526270;
-    margin-right: 16px;
-  }
-
-  .select-box{
-    height: 30px;
-    outline: none;
-    border: 1px solid #ccc;
-    border-radius: 7px;
-    padding: 2px 12px;
-    color: #526270;
-    margin-right: 16px;
-    cursor: pointer;
-
-    option{
-      cursor: pointer;
-    }
-  }
-}
 .table {
-  width: 800px;
+  width: 900px;
   margin: 0 auto;
 
   table {
     width: 100%;
     border: solid 1px #aaa999;
 
+    .checkbox{
+      cursor: pointer;
+    }
+
     tr {
       th {
         border: solid 1px #aaa999;
+        padding: 10px;
       }
 
       td {
