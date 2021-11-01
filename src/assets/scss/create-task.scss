@@ -12,6 +12,21 @@
     label {
       margin-bottom: 8px;
     }
+
+    .select-box{
+      height: 30px;
+      outline: none;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      padding: 2px 12px;
+      color: #526270;
+      margin-right: 16px;
+      cursor: pointer;
+
+      option{
+        cursor: pointer;
+      }
+    }
   }
 
   .error-input{

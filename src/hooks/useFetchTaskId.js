@@ -4,7 +4,11 @@ const useFetchTaskId = async (store,id) => {
     const response = await store.dispatch("getTaskById",{id});
     return response.data;
   } catch (e) {
-    console.log(e.message);
+    await store.commit("setSnackbar", {
+      show: true,
+      message: "Something went wrong",
+      color: "error",
+    });
   }
 };
 

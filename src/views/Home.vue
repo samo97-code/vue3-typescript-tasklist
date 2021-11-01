@@ -61,6 +61,7 @@
                 class="edit-btn"
                 :disabled="task.status === 'finished'"
                 :class="{ disabled: task.status === 'finished' }"
+                @click="editTask(task)"
               >
                 Edit
               </button>
@@ -73,7 +74,7 @@
           </tr>
         </tbody>
       </table>
-      <h3 v-if="!tasks.length">We cant find search task 😔</h3>
+      <h3 v-if="!tasks.length">We cant find searched task 😔</h3>
     </div>
   </div>
 </template>
@@ -156,26 +157,47 @@ export default defineComponent({
     const deleteAll = async (): Promise<void>=>{
       if (selected.value.length){
         try {
-          await selected.value.forEach(async(id)=>{
-            await store.dispatch("deleteTask", { id });
-            const index = await tasks.value.findIndex((item: Tasks) => item.id === id);
-            tasks.value.splice(index, 1);
+          await selected.value.forEach((id)=>{
+             deleteFunc(id)
           })
         } catch (e) {
-          console.log(e.message);
+          await store.commit("setSnackbar", {
+            show: true,
+            message: "Something went wrong",
+            color: "error",
+          });
         }
       }
     }
 
     const deleteTask = async (id: number): Promise<void> => {
       try {
-        await store.dispatch("deleteTask", { id });
-        const index = tasks.value.findIndex((item: Tasks) => item.id === id);
-        tasks.value.splice(index, 1);
+        await deleteFunc(id)
       } catch (e) {
-        console.log(e.message);
+        await store.commit("setSnackbar", {
+          show: true,
+          message: "Something went wrong",
+          color: "error",
+        });
       }
     };
+
+    const deleteFunc = async (id: number)=>{
+      await store.dispatch("deleteTask", { id });
+      const index = tasks.value.findIndex((item: Tasks) => item.id === id);
+      tasks.value.splice(index, 1);
+      await store.commit("setSnackbar", {
+        show: true,
+        message: "Successfully deleted",
+        color: "success",
+      });
+    }
+
+    const editTask = (task: Tasks)=>{
+      if (task.status !== 'finished'){
+        router.push(`/edit-task/${task.id}`)
+      }
+    }
 
     const toLink = (id: number): void => {
       router.push(`/task-details/${id}`);
@@ -189,7 +211,7 @@ export default defineComponent({
       }
     }
 
-    return { tasks,search, limit,selected, deleteTask, toLink, descFormat, checkStatus, orderBy, selectAll, selectItem, deleteAll };
+    return { tasks,search, limit,selected, deleteTask, toLink, descFormat, checkStatus, orderBy, selectAll, selectItem, deleteAll, editTask };
   },
 });
 </script>

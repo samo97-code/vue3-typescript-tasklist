@@ -17,6 +17,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "TaskDetails",
     component: () => import("../views/TaskDetails.vue"),
   },
+  {
+    path: "/edit-task/:id",
+    name: "EditTask",
+    component: () => import("../views/EditTask.vue"),
+  },
 ];
 
 const router = createRouter({

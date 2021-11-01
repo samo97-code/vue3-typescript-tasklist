@@ -2,12 +2,16 @@ import { createStore } from "vuex";
 import axios from "axios";
 export default createStore({
   state: {
-    firstName: "",
+    snackbar: {
+      show: false,
+      message: "",
+      color: "success",
+    },
   },
   mutations: {
-    // setTasks(state, payload: Tasks) {
-    //   state.tasks = [...state.tasks, payload];
-    // },
+    setSnackbar(state, payload) {
+      state.snackbar = payload;
+    },
   },
   actions: {
     async getTasks(_,payload) {
@@ -23,9 +27,12 @@ export default createStore({
     async deleteTask(_, payload) {
       return await axios.delete(`http://localhost:8081/tasks/${payload.id}`);
     },
+    async updateTask(_, payload) {
+      return await axios.patch(`http://localhost:8081/tasks/${payload.id}`, payload);
+    },
   },
   getters: {
-    // tasks: (state) => state.tasks,
+    snackbar: (state) => state.snackbar,
   },
   modules: {},
 });

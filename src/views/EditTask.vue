@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>Create task</h1>
+    <h1>Edit task</h1>
     <div class="content">
       <div class="form-group">
         <label for="title" class="title-name">Title</label>
@@ -43,12 +43,18 @@
         <ErrorList :errors="errors.description"/>
       </div>
 
+      <div class="form-group">
+        <select id="" class="select-box" v-model="form.status">
+          <option :value="value" v-for="value in statusOptions" :key="value">{{ value }}</option>
+        </select>
+      </div>
+
       <div>
         <button
-          @click.prevent="createTask"
+          @click.prevent="updateTask"
           class="success-btn"
           :class="{ disabled: disabledBtn }"
-          :disabled="disabledBtn">Create Task</button>
+          :disabled="disabledBtn">Update Task</button>
       </div>
     </div>
   </div>
@@ -58,9 +64,11 @@
 import { defineComponent, reactive, computed } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import Tasks from "@/interface/Tasks.interface";
 import useValidate from '@/hooks/useValidate'
 import ErrorList from '@/components/ErrorList.vue'
+import useFetchTaskId from "@/hooks/useFetchTaskId";
 const validRules = {
   title: {
     required: true,
@@ -75,36 +83,34 @@ const validRules = {
 };
 
 export default defineComponent({
-  name: "CreateTask",
+  name: "EditTask",
   components: {
     ErrorList
   },
 
-  setup() {
+  async setup() {
     const store = useStore();
     const router = useRouter();
+    const route = useRoute();
 
-    // if we want hooks key as index
-    // const form: { [key: string]: string } = reactive({
-    const form = reactive({
-      title: "",
-      date: "",
-      description: "",
-    });
+    const task = await useFetchTaskId(store,route.params.id)
+    const form = reactive(task) as Tasks;
+
+    const statusOptions = ['created','working','finished']
 
     const errors: { [key: string]: any} = reactive(
       {
         title: {
           list: [] as string[],
-          invalid: false
+          invalid: true
         },
         date: {
           list: [] as string[],
-          invalid: false
+          invalid: true
         },
         description: {
           list: [] as string[],
-          invalid: false
+          invalid: true
         },
       }
     );
@@ -118,28 +124,19 @@ export default defineComponent({
       return disabled
     })
 
-
     //Methods
     const inputHandler = (type: string | number)=>{
-     const {list} = useValidate(form,validRules,type)
+      const {list} = useValidate(form,validRules,type)
       errors[type].list = list
       errors[type].invalid = !list.length
     }
 
-    const createTask = async () => {
+    const updateTask = async () => {
       try {
-        const obj: Tasks = {
-          id: Date.now(),
-          title: form.title,
-          date: form.date,
-          description: form.description,
-          status: "created",
-        };
-
-        await store.dispatch("createTask", obj);
+        await store.dispatch("updateTask", form);
         await store.commit("setSnackbar", {
           show: true,
-          message: "Successfully created",
+          message: "Successfully updated",
           color: "success",
         });
         await router.push("/");
@@ -152,7 +149,7 @@ export default defineComponent({
       }
     };
 
-    return { form,errors, disabledBtn, createTask, inputHandler };
+    return { form,errors, disabledBtn, statusOptions, updateTask, inputHandler };
   },
 });
 </script>
