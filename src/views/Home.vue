@@ -195,45 +195,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.table {
-  width: 900px;
-  margin: 0 auto;
-
-  table {
-    width: 100%;
-    border: solid 1px #aaa999;
-
-    .checkbox{
-      cursor: pointer;
-    }
-
-    tr {
-      th {
-        border: solid 1px #aaa999;
-        padding: 10px;
-      }
-
-      td {
-        border: solid 1px #aaa999;
-        padding: 7px;
-
-        .status {
-          padding: 2px 4px;
-          color: white;
-          border-radius: 7px;
-          font-size: 14px;
-        }
-
-        .disabled {
-          background: #b9b6b6;
-          cursor: not-allowed;
-
-          &:hover {
-            background: #b9b6b6;
-          }
-        }
-      }
-    }
-  }
-}
+@import "../assets/scss/table";
 </style>

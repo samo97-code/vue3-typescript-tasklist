@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>This is an create task</h1>
+    <h1>Create task</h1>
     <div class="content">
       <div class="form-group">
         <label for="title" class="title-name">Title</label>
@@ -10,11 +10,23 @@
           v-model="form.title"
           type="text"
           placeholder="Title"
+          :class="{'error-input': errors.title.list.length}"
+          @input="inputHandler('title')"
         />
+        <ErrorList :errors="errors.title.list"/>
       </div>
       <div class="form-group">
         <label for="date" class="title-name">Date</label>
-        <input id="date" v-model="form.date" type="date" placeholder="Date"  class="searchbar"/>
+        <input
+          id="date"
+          v-model="form.date"
+          type="date"
+          placeholder="Date"
+          class="searchbar"
+          :class="{'error-input': errors.date.list.length}"
+          @input="inputHandler('date')"
+        />
+        <ErrorList :errors="errors.date.list"/>
       </div>
       <div class="form-group">
         <label for="desc" class="title-name">Description</label>
@@ -25,25 +37,48 @@
           rows="10"
           placeholder="Description"
           class="textarea"
+          :class="{'error-input': errors.description.list.length}"
+          @input="inputHandler('description')"
         ></textarea>
+        <ErrorList :errors="errors.description"/>
       </div>
 
       <div>
-        <button @click.prevent="createTask" class="success-btn">Create Task</button>
+        <button
+          @click.prevent="createTask"
+          class="success-btn"
+          :class="{ disabled: disabledBtn }"
+          :disabled="disabledBtn">Create Task</button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, computed } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import Tasks from "@/interface/Tasks.interface";
+import useValidate from '@/hooks/useValidate'
+import ErrorList from '@/components/ErrorList.vue'
+const validRules = {
+  title: {
+    required: true,
+    minLength: 8,
+  },
+  date: {
+    required: true,
+  },
+  description: {
+    required: true,
+  },
+};
 
 export default defineComponent({
   name: "CreateTask",
-  components: {},
+  components: {
+    ErrorList
+  },
 
   setup() {
     const store = useStore();
@@ -57,6 +92,32 @@ export default defineComponent({
       description: "",
     });
 
+    const errors: { [key: string]: any} = reactive(
+      {
+        title: {
+          list: [] as string[],
+          invalid: false
+        },
+        date: {
+          list: [] as string[],
+          invalid: false
+        },
+        description: {
+          list: [] as string[],
+          invalid: false
+        },
+      }
+    );
+
+    //Computed
+    const disabledBtn = computed(()=>{
+      let disabled = false
+      Object.entries(errors).forEach((item)=>{
+        if (!item[1].invalid) disabled = true
+      })
+      return disabled
+    })
+
     const createTask = async () => {
       const obj: Tasks = {
         id: Date.now(),
@@ -68,29 +129,19 @@ export default defineComponent({
 
       await store.dispatch("createTask", obj);
       await router.push("/");
-      // await Object.keys(form).forEach((item: string) => (form[item] = ""));
     };
 
-    return { form, createTask };
+    const inputHandler = (type: string | number)=>{
+     const {list} = useValidate(form,validRules,type)
+      errors[type].list = list
+      errors[type].invalid = !list.length
+    }
+
+    return { form,errors, disabledBtn, createTask, inputHandler };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.content {
-  max-width: 500px;
-  margin: 0 auto;
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    text-align: left;
-    margin-bottom: 30px;
-
-    label {
-      margin-bottom: 8px;
-    }
-  }
-}
+@import "../assets/scss/create-task";
 </style>

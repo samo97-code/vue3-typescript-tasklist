@@ -26,11 +26,5 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.order {
-  margin-left: 8px;
-
-  span {
-    cursor: pointer;
-  }
-}
+@import "../assets/scss/order-by";
 </style>

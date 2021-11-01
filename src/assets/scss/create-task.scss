@@ -1,0 +1,20 @@
+.content {
+  max-width: 500px;
+  margin: 0 auto;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-align: left;
+    margin-bottom: 30px;
+
+    label {
+      margin-bottom: 8px;
+    }
+  }
+
+  .error-input{
+    border: 1px solid #dc3545;
+  }
+}

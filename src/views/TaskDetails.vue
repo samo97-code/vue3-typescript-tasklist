@@ -33,28 +33,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.details{
-  width: 500px;
-  margin: 0 auto;
-
-  p{
-    margin: 0;
-  }
-
-  .content{
-    display: flex;
-    justify-content: space-between;
-    text-align: left;
-
-    .desc{
-      width: 300px;
-    }
-
-    .info{
-      display: flex;
-      flex-direction: column;
-      text-align: end;
-    }
-  }
-}
+@import "../assets/scss/details";
 </style>
