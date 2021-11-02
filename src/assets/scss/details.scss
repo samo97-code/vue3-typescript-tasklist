@@ -7,18 +7,12 @@
   }
 
   .content{
-    display: flex;
-    justify-content: space-between;
     text-align: left;
-
-    .desc{
-      width: 300px;
-    }
 
     .info{
       display: flex;
       flex-direction: column;
-      text-align: end;
+      margin-bottom: 20px;
     }
   }
 }

@@ -2,11 +2,11 @@
   <div class="details">
     <h1>{{task.title}} details</h1>
     <div class="content">
-      <p class="desc">{{task.description}}</p>
       <div class="info">
-        <b class="date">{{task.date }}</b>
-        <b class="status">{{ task.status }}</b>
+        <p class="date"><b>Date:</b> {{task.date }}</p>
+        <p class="status"><b>Status: </b>{{ task.status }}</p>
       </div>
+      <p class="desc">{{task.description}}</p>
     </div>
   </div>
 </template>
